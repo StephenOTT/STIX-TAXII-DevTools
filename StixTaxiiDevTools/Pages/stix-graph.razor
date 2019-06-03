@@ -1,0 +1,117 @@
+﻿@page "/stix-graph"
+@inject IJSRuntime JsRuntime;
+
+<h1>STIX Graph Visualizer</h1>
+
+<p>Visualize your STIX Bundle.  Your bundle will be validated and transformed from a STIX Bundle into a Graph format:</p>
+<p>Click and hold on a element for additional options</p>
+<div class="row">
+  
+  <div id="@Id" class="col-md-8 cy-container"></div>
+
+  <div class="col-md-4">
+    <form>
+      <div class="form-group">
+        
+        <label for="cy-data-area">CY Data: Update me for CY to update</label>
+        <textarea class="form-control" 
+                  id="cy-data-area" 
+                  rows = "20" 
+                  cols = "50" 
+                  value="@Data" 
+                  onchange="@HandleTextAreaDataChangeAsync"></textarea>
+
+      </div>
+    </form>
+  </div>
+
+</div>
+<div class="row">
+  <div class="col-md-12">
+    <form>
+      <div class="form-group">
+        
+        <label for="cy-clicked-node-data">Selected Node Data</label>
+        <textarea class="form-control" 
+                  id="cy-clicked-node-data" 
+                  rows = "20" 
+                  cols = "50" 
+                  bind="@SelectedNodeData" ></textarea>
+
+      </div>
+    </form>
+  </div>
+
+</div>
+
+@functions {
+
+  public string Id {get; set;}
+
+  public string Data {get; set;}
+
+  public static string SelectedNodeData {get; set;}
+
+  protected override void OnInit()
+  {
+      Id = "cy-" + System.Guid.NewGuid();
+      Data = GenDefaultData().ToString();
+  }
+
+  protected override async Task OnAfterRenderAsync()
+  {
+      await StartCyAsync();
+  }
+
+  [JSInvokable]
+  public static Task<String> SetSelectedData(string NodeData){
+    SelectedNodeData = NodeData;
+    return Task.FromResult(NodeData);
+  }
+
+  private dynamic GenDefaultData(){
+    string json = @"[
+      {
+        data: {
+          id: 'a'
+        }
+      },
+      {
+        data: {
+          id: 'b'
+        }
+      },
+      {
+        data: {
+          id: 'ab',
+          source: 'a',
+          target: 'b'
+        }
+      }
+    ]";
+
+    dynamic jsonObject = ConvertStringToJsonStringAsync(json);
+    return jsonObject;
+  }
+
+  private async Task HandleTextAreaDataChangeAsync(UIChangeEventArgs evt)
+  {
+      Data = ConvertStringToJsonStringAsync(evt.Value.ToString());
+      await UpdateCyAsync();
+  }
+
+  private async Task StartCyAsync(){
+    await JsRuntime.InvokeAsync<object>("setupCytoscape", Id, Data); 
+  }
+
+  private async Task UpdateCyAsync(){
+    await JsRuntime.InvokeAsync<object>("updateCy", Id, Data);
+  }
+
+  private string ConvertStringToJsonStringAsync(string input){
+    dynamic jsonObject = JsonConvert.DeserializeObject(input);
+    string jsonString = JsonConvert.SerializeObject(jsonObject).ToString();
+    return jsonString;
+  }
+
+}
