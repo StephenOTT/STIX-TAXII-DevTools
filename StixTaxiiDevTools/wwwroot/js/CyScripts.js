@@ -19,7 +19,7 @@ function setupCytoscape(containerId, dataElements) {
       {
         selector: 'node',
         style: {
-          'font-size': 10,
+          'font-size': 3,
           'background-color': '#666',
           'label': 'data(id)',
           'background-image': function(ele){ return getNodeBackgroundImage(ele.data('type')) },
@@ -30,11 +30,11 @@ function setupCytoscape(containerId, dataElements) {
       {
         selector: 'edge',
         style: {
-          'font-size': 8,
+          'font-size': 6,
           'label': 'data(label)',
           'curve-style': 'bezier',
           'target-arrow-shape': 'triangle',
-          'text-background-opacity': 0.5,
+          'text-background-opacity': 1,
           'text-background-color': '#FFFFFF',
 
 
@@ -43,7 +43,8 @@ function setupCytoscape(containerId, dataElements) {
     ],
 
     layout: {
-      name: 'cose-bilkent'
+      name: 'cose-bilkent',
+      nodeDimensionsIncludeLabels: true
     },
     
     wheelSensitivity: 0.5
@@ -65,16 +66,24 @@ function getNodeBackgroundImage(type){
   if (type == 'attack-pattern') {
     return '../css/stix-icons/attack-pattern-round-flat-300-dpi.png'
 
-  } else if (type == 'observed-data"') {
-    return '../css/stix-icons/incident-round-flat-300-dpi.png'
+  } else if (type == 'observed-data') {
+    return '../css/stix-icons/observed-data-round-flat-300-dpi.png'
 
   } else if (type == 'sighting') {
     return '../css/stix-icons/sighting-round-flat-300-dpi.png'
+
+  } else if (type == 'coo-ipv4-addr') {
+    return '../css/stix-icons/ipv4-addr-round-flat-300-dpi.png'
+
+  } else if (type == 'coo-domain-name') {
+    return '../css/stix-icons/domain-name-round-flat-300-dpi.png'
+
 
   } else {
     return '../css/stix-icons/infrastructure-round-flat-300-dpi.png'
   }
 
 
+ipv4-addr-round-flat-300-dpi
 
 }
